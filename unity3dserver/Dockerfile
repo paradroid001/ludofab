@@ -193,9 +193,6 @@ RUN mkdir -p /root/.local/share/unity3d/Certificates/ && \
     mkdir -p /root/.local/share/unity3d/Unity/ && \
     /opt/Unity/Editor/Unity -batchmode -quit -nographics -createManualActivationFile -logfile /dev/stdout || :
 
-ADD conf/CACerts.pem /root/.local/share/unity3d/Certificates/
-ADD conf/asound.conf /etc/
-
 #So we can execute commands:
 # https://stackoverflow.com/questions/59035543/how-to-execute-command-from-one-docker-container-to-another
 
@@ -206,7 +203,9 @@ RUN useradd -m --no-log-init --system --uid 1000 unitybuild -s /bin/bash -g sudo
 run echo 'unitybuild:unitybuild' | chpasswd
 
 USER unitybuild
-ADD build.sh /home/unitybuild
+ADD build.sh /home/unitybuild/
+ADD conf/CACerts.pem /home/unitybuild/.local/share/unity3d/Certificates/
+ADD conf/asound.conf /etc/
 
 USER root
 RUN mkdir /run/sshd

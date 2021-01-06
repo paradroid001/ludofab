@@ -11,7 +11,7 @@ services:
       - ./mounts/src:/src
       - ./mounts/builds:/builds
   unity3dbuildserver:
-    image: dockerunity
+    image: unity3dbuildserver
     volumes:
       - ./mounts/src:/src
       - ./mounts/builds:/builds
