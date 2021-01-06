@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  jenkinsserver:
+    image: jenkinsserver
+    ports:
+      - 8080:8080
+      - 50000:50000
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - ./mounts/src:/src
+      - ./mounts/builds:/builds
+  unity3dbuildserver:
+    image: dockerunity
+    volumes:
+      - ./mounts/src:/src
+      - ./mounts/builds:/builds
+      - ./mounts/home/unitybuild:/home/unitybuild
+    command: /usr/sbin/sshd -D
+  dotnetbuildserver:
+    image: dotnetbuildserver
+    volumes:
+      - ./mounts/src:/src
+      - ./mounts/builds:/builds
+    command: /usr/sbin/sshd -D  
+volumes:
+  jenkins_home:
+
+
