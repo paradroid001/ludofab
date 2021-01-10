@@ -36,13 +36,10 @@ RUN apt install gnupg ca-certificates \
 
 # if the packages were already installed
 RUN apt upgrade
-
 # otherwise
 RUN apt install -y mono-complete msbuild
-
 #cleanup
 RUN rm *.deb
-
 #create unitybuild user
 RUN useradd -m --no-log-init --system --uid 1000 dotnetbuild -s /bin/bash -g sudo -G root
 #set the password to dotnetbuild
@@ -52,3 +49,6 @@ RUN apt install -y openssh-server
 
 #so sshd can run
 RUN mkdir /run/sshd
+RUN cd /etc/ssh && ssh-keygen -A
+
+#USER dotnetbuild

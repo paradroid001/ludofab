@@ -187,11 +187,6 @@ RUN apt-get autoremove \
     && rm -rf /tmp/* \
     && rm -rf /var/tmp/*
 
-RUN echo "Running Unity for licensing / cert creation"
-#Certificates / licensing
-RUN mkdir -p /root/.local/share/unity3d/Certificates/ && \
-    mkdir -p /root/.local/share/unity3d/Unity/ && \
-    /opt/Unity/Editor/Unity -batchmode -quit -nographics -createManualActivationFile -logfile /dev/stdout || :
 
 #So we can execute commands:
 # https://stackoverflow.com/questions/59035543/how-to-execute-command-from-one-docker-container-to-another
@@ -204,8 +199,14 @@ run echo 'unitybuild:unitybuild' | chpasswd
 
 USER unitybuild
 ADD build.sh /home/unitybuild/
+
+RUN echo "Running Unity for licensing / cert creation"
+#Certificates / licensing
+RUN mkdir -p ~/.local/share/unity3d/Certificates/ && \
+    mkdir -p ~/.local/share/unity3d/Unity/
 ADD conf/CACerts.pem /home/unitybuild/.local/share/unity3d/Certificates/
 ADD conf/asound.conf /etc/
+RUN /opt/Unity/Editor/Unity -batchmode -quit -nographics -createManualActivationFile -logfile manualactivationfile.log /dev/stdout || :
 
 USER root
 RUN mkdir /run/sshd
