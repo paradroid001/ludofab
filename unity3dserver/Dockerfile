@@ -195,10 +195,14 @@ RUN apt-get autoremove \
 RUN useradd -m --no-log-init --system --uid 1000 unitybuild -s /bin/bash -g sudo -G root
 
 #set the password to unitybuild
-run echo 'unitybuild:unitybuild' | chpasswd
+RUN echo 'unitybuild:unitybuild' | chpasswd
 
 USER unitybuild
-ADD build.sh /home/unitybuild/
+ADD unitybuild.sh /src/
+#fix build tool line endings if cloned on windows machine
+RUN sed $'s/\r$//' /src/unitybuild.sh > /src/unitybuildCorrect.sh \
+&& mv /src/unitybuildCorrect.sh /src/untybuild.sh \
+&& chmod +x /src/unitybuild.sh
 
 RUN echo "Running Unity for licensing / cert creation"
 #Certificates / licensing
@@ -208,7 +212,9 @@ ADD conf/CACerts.pem /home/unitybuild/.local/share/unity3d/Certificates/
 ADD conf/asound.conf /etc/
 RUN /opt/Unity/Editor/Unity -batchmode -quit -nographics -createManualActivationFile -logfile manualactivationfile.log /dev/stdout || :
 
+
 USER root
+#copy libraries to /src/opt/Unity/Editor/Data/Managed so they can be linked against
+RUN mkdir -p /src/opt/Unity/Editor/Data/Managed
+RUN cp -R /opt/Unity/Editor/Data/Managed /src/opt/Unity/Editor/Data/
 RUN mkdir /run/sshd
-
-

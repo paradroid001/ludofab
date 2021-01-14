@@ -43,8 +43,16 @@ RUN rm *.deb
 #create unitybuild user
 RUN useradd -m --no-log-init --system --uid 1000 dotnetbuild -s /bin/bash -g sudo -G root
 #set the password to dotnetbuild
-run echo 'dotnetbuild:dotnetbuild' | chpasswd
+RUN echo 'dotnetbuild:dotnetbuild' | chpasswd
+ADD dotnetbuild.sh /src/
+RUN chown dotnetbuild:sudo /src/dotnetbuild.sh
+USER dotnetbuild
+#fix build tool line endings if cloned on windows machine
+RUN sed $'s/\r$//' /src/dotnetbuild.sh > /src/dotnetbuildCorrect.sh \
+&& mv /src/dotnetbuildCorrect.sh /src/dotnetbuild.sh \
+&& chmod +x /src/dotnetbuild.sh
 
+USER root
 RUN apt install -y openssh-server
 
 #so sshd can run
